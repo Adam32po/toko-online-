@@ -20,9 +20,9 @@
                         brand: { 
                             cyan: '#00f2fe', 
                             blue: '#4facfe', 
-                            dark: '#0f172a', // Slate 900
-                            darker: '#020617', // Slate 950
-                            card: '#1e293b', // Slate 800
+                            dark: '#0f172a', 
+                            darker: '#020617', 
+                            card: '#1e293b', 
                             danger: '#ef4444' 
                         } 
                     }
@@ -52,7 +52,6 @@
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
-        /* Sidebar active state styling */
         .nav-btn.active { background: rgba(0, 242, 254, 0.1); border-right: 3px solid #00f2fe; color: #00f2fe; }
     </style>
 </head>
@@ -68,7 +67,6 @@
         <!-- Sidebar -->
         <aside class="w-full md:w-64 bg-brand-darker border-r border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-20">
             <div class="p-8 border-b border-slate-800 relative overflow-hidden bg-brand-dark">
-                <!-- Glitch/Cyber pattern overlay -->
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 
                 <div class="relative z-10 flex items-center gap-3">
@@ -182,7 +180,7 @@
                 </div>
             </div>
 
-            <!-- Input Barang (Dengan Input Video) -->
+            <!-- Input Barang (Opsi Lokal atau URL) -->
             <div id="admin-input" class="admin-section view-hidden fade-in">
                 <div class="max-w-3xl bg-brand-card p-8 rounded-lg border border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                     <div class="flex items-center gap-3 mb-8 border-b border-slate-700 pb-4">
@@ -221,19 +219,20 @@
                             </div>
                         </div>
                         
+                        <!-- UPDATE: Image URL (Sekarang bertipe TEXT untuk file lokal/web URL) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-                            <!-- Image URL -->
                             <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-brand-blue transition-colors">
-                                <label class="text-[10px] uppercase tracking-widest text-brand-blue font-bold block mb-2"><i class="fa-regular fa-image mr-1"></i> URL Gambar (Thumbnail) *</label>
-                                <input type="url" id="inp-image" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-brand-blue text-white" required placeholder="https://link-gambar.jpg">
+                                <label class="text-[10px] uppercase tracking-widest text-brand-blue font-bold block mb-2"><i class="fa-regular fa-image mr-1"></i> Nama File / URL Gambar *</label>
+                                <input type="text" id="inp-image" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-brand-blue text-white" required placeholder="Contoh: rtx_5090.jpg ATAU https://...">
+                                <p class="text-[9px] text-slate-500 mt-2">Ketik nama file (jika ada di GitHub) atau paste link gambar.</p>
                             </div>
                             
-                            <!-- Video URL (NEW FEATURE) -->
+                            <!-- UPDATE: Video URL (Sekarang bertipe TEXT) -->
                             <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-red-500 transition-colors relative overflow-hidden">
-                                <div class="absolute -right-4 -bottom-4 text-red-500/10"><i class="fa-brands fa-youtube text-7xl"></i></div>
-                                <label class="text-[10px] uppercase tracking-widest text-red-400 font-bold block mb-2 relative z-10"><i class="fa-brands fa-youtube mr-1"></i> URL Video YouTube (Opsional)</label>
-                                <input type="url" id="inp-video" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-red-500 text-white relative z-10" placeholder="https://www.youtube.com/watch?v=...">
-                                <p class="text-[9px] text-slate-500 mt-2 relative z-10">Video review/showcase untuk ditampilkan di halaman produk.</p>
+                                <div class="absolute -right-4 -bottom-4 text-red-500/10"><i class="fa-solid fa-play text-7xl"></i></div>
+                                <label class="text-[10px] uppercase tracking-widest text-red-400 font-bold block mb-2 relative z-10"><i class="fa-solid fa-video mr-1"></i> Nama File / URL Video (Opsional)</label>
+                                <input type="text" id="inp-video" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-red-500 text-white relative z-10" placeholder="Contoh: rtx rog 5090 dhabab edisi.mp4 ATAU Link YouTube">
+                                <p class="text-[9px] text-slate-500 mt-2 relative z-10">Bisa nama file MP4 (dari GitHub) atau link YouTube.</p>
                             </div>
                         </div>
                         
@@ -389,11 +388,10 @@
         const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
 
         const showAdminMenu = (sectionId, btnElement) => {
-            // Update Active Menu Styling
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active', 'bg-slate-800', 'text-white', 'border-r-[3px]', 'border-brand-cyan', 'text-brand-cyan');
                 btn.style.background = ''; 
-                if(!btn.classList.contains('bg-brand-cyan/10')) { // Abaikan tombol Add
+                if(!btn.classList.contains('bg-brand-cyan/10')) {
                     btn.classList.add('text-slate-400');
                 }
             });
@@ -401,7 +399,6 @@
                 btnElement.classList.add('active', 'text-brand-cyan');
             }
 
-            // Hide/Show sections
             document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
             document.getElementById(sectionId).classList.remove('view-hidden');
             
@@ -411,7 +408,7 @@
             if(sectionId === 'admin-customers') renderOrdersTable();
         };
 
-        // Fungsi ekstrak ID YouTube dari link apapun
+        // Fungsi ekstrak ID YouTube dari link
         const extractVideoID = (url) => {
             let videoID = "";
             if(url) {
@@ -467,10 +464,13 @@
                 const isSoldOut = (p.stock === 0 || p.stock === undefined);
                 const sizesText = p.sizes ? p.sizes.join(', ') : '-';
                 
-                // Cek apakah ada ID Video
-                const videoBadge = p.ytVideoId 
-                    ? `<span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-brands fa-youtube"></i> Video Tersedia</span>` 
-                    : '';
+                // Deteksi Video: File Lokal ATAU YouTube
+                let videoBadge = '';
+                if(p.ytVideoId) {
+                    videoBadge = `<span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-brands fa-youtube"></i> YouTube URL</span>`;
+                } else if(p.ytVideoUrl) {
+                    videoBadge = `<span class="bg-blue-500/20 text-brand-blue text-[9px] px-1.5 py-0.5 rounded border border-blue-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-solid fa-film"></i> File Lokal</span>`;
+                }
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/50 transition-colors";
@@ -735,7 +735,7 @@
             
             // Proses URL Video
             const rawVideoUrl = document.getElementById('inp-video').value;
-            const extractedId = extractVideoID(rawVideoUrl);
+            const extractedId = extractVideoID(rawVideoUrl); // Coba ekstrak jika formatnya link YouTube
 
             const newProduct = {
                 id: Date.now(),
@@ -744,10 +744,10 @@
                 price: parseFloat(document.getElementById('inp-price').value),
                 stock: parseInt(document.getElementById('inp-stock').value),
                 sold: 0,
-                imageUrl: document.getElementById('inp-image').value,
+                imageUrl: document.getElementById('inp-image').value, // Input fleksibel (nama file atau link web)
                 sizes: sizesArray,
-                ytVideoUrl: rawVideoUrl,        // Simpan URL asli (opsional)
-                ytVideoId: extractedId         // Simpan ID agar gampang di-embed
+                ytVideoUrl: rawVideoUrl,        // Simpan input asli (Bisa nama file mp4, atau link YT penuh)
+                ytVideoId: extractedId          // Akan berisi ID YouTube, atau KOSONG ("") jika file lokal
             };
 
             products.push(newProduct);
@@ -757,7 +757,6 @@
             showToast('Data hardware berhasil ditulis ke database utama!');
             e.target.reset();
             
-            // Kembali ke menu Produk
             showAdminMenu('admin-products', document.querySelectorAll('.nav-btn')[1]);
         };
 
