@@ -508,7 +508,6 @@
                 tr.className = "hover:bg-slate-800/50 transition-colors";
                 tr.innerHTML = `
                     <td class="p-4 flex items-center gap-4 border-b-0">
-                        <!-- FIX GAMBAR GEPENG: flex-shrink-0 dan object-contain -->
                         <div class="relative flex-shrink-0">
                             <img src="${p.imageUrl}" class="w-14 h-14 rounded object-contain border border-slate-600 bg-slate-900 p-0.5">
                         </div>
@@ -533,6 +532,12 @@
                     <td class="p-4 border-b-0">
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-brand-cyan mr-3 font-mono text-xs">${p.sold || 0} terjual</span>
+                            
+                            <!-- TOMBOL BARU UNTUK EDIT HARGA -->
+                            <button onclick="editProductPrice(${p.id})" class="bg-slate-800 border border-slate-600 hover:border-brand-blue hover:text-brand-blue text-slate-300 text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded font-bold transition flex items-center gap-1" title="Ubah Harga Jual">
+                                <i class="fa-solid fa-tag"></i> Harga
+                            </button>
+                            
                             <button onclick="restockProduct(${p.id})" class="bg-slate-800 border border-slate-600 hover:border-brand-cyan hover:text-brand-cyan text-slate-300 text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded font-bold transition flex items-center gap-1" title="Update Stok & Specs">
                                 <i class="fa-solid fa-arrows-rotate"></i> Update
                             </button>
@@ -544,6 +549,26 @@
                 `;
                 tbody.appendChild(tr);
             });
+        };
+
+        // --- FUNGSI BARU UNTUK EDIT HARGA ---
+        const editProductPrice = (id) => {
+            let products = JSON.parse(localStorage.getItem('utx_products')) || [];
+            let p = products.find(prod => prod.id === id);
+            if(p) {
+                let newPriceStr = prompt(`[SISTEM] Masukkan Harga Baru untuk "${p.name}":\n(Hanya masukkan angka, hilangkan titik/koma)`, p.price);
+                if(newPriceStr !== null && newPriceStr.trim() !== "") {
+                    let newPrice = parseInt(newPriceStr);
+                    if(!isNaN(newPrice) && newPrice > 0) {
+                        p.price = newPrice;
+                        localStorage.setItem('utx_products', JSON.stringify(products));
+                        renderAdminData();
+                        showToast(`Update sukses! Harga MSRP untuk SKU ${p.code} berhasil diperbarui.`);
+                    } else {
+                        showToast('Input harga tidak valid. Pastikan hanya memasukkan angka.', 'error');
+                    }
+                }
+            }
         };
 
         const restockProduct = (id) => {
