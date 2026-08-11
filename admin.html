@@ -461,7 +461,7 @@
             document.getElementById('stat-total-sold').innerText = totalSold;
             document.getElementById('stat-active-users').innerText = customers.length;
 
-            let totalIncome = orders.reduce((acc, o) => acc + o.total, 0); 
+            let totalIncome = orders.reduce((acc, o) => acc + (Number(o.total) || 0), 0); 
             let netProfit = totalIncome - savedExpense; 
 
             document.getElementById('daily-income').innerText = formatRupiah(totalIncome);
@@ -475,10 +475,14 @@
             profitEl.innerText = formatRupiah(netProfit);
             profitEl.className = netProfit < 0 ? "text-2xl font-bold relative z-10 text-brand-danger font-mono" : "text-2xl font-bold relative z-10 text-white font-mono";
 
-            document.getElementById('stat-total-revenue').innerText = formatRupiah(netProfit);
+            const revenueEl = document.getElementById('stat-total-revenue');
+            revenueEl.innerText = formatRupiah(netProfit);
             if(netProfit < 0) {
-                document.getElementById('stat-total-revenue').classList.add('text-brand-danger');
-                document.getElementById('stat-total-revenue').classList.remove('text-white');
+                revenueEl.classList.add('text-brand-danger');
+                revenueEl.classList.remove('text-white');
+            } else {
+                revenueEl.classList.remove('text-brand-danger');
+                revenueEl.classList.add('text-white');
             }
 
             renderFinancialBars(totalIncome, savedExpense);
@@ -606,16 +610,87 @@
             }
         };
 
+        // --- SISTEM KALKULASI REAL-TIME FINANCIAL TELEMETRY ---
         const renderFinancialBars = (totalIncome, totalExpense) => {
             const container = document.getElementById('financial-bars-container');
             container.innerHTML = '';
 
+            const ordersList = JSON.parse(localStorage.getItem('utx_orders')) || [];
+
+            // Helper format Tanggal Lokal (YYYY-MM-DD)
+            const formatDateKey = (d) => {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            const formatDisplayDate = (d) => {
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                return `${day}/${month}`;
+            };
+
+            // Inisialisasi referensi 3 hari (Kemarin Lusa, Kemarin, Hari Ini)
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today.getTime() - 86400000);
+            const twoDaysAgo = new Date(today.getTime() - 172800000);
+
             const daysData = [
-                { label: 'Siklus T-2 (Kemarin)', income: Math.round(totalIncome * 0.3), expense: Math.round(totalExpense * 0.4) },
-                { label: 'Siklus T-1 (Hari Ini)', income: Math.round(totalIncome * 0.5), expense: Math.round(totalExpense * 0.5) },
-                { label: 'Siklus T-0 (Proyeksi Esok)', income: Math.round(totalIncome * 0.2), expense: Math.round(totalExpense * 0.1) }
+                { 
+                    label: `Siklus T-2 (${formatDisplayDate(twoDaysAgo)})`, 
+                    dateKey: formatDateKey(twoDaysAgo), 
+                    income: 0, 
+                    expense: 0 
+                },
+                { 
+                    label: `Siklus T-1 (Kemarin - ${formatDisplayDate(yesterday)})`, 
+                    dateKey: formatDateKey(yesterday), 
+                    income: 0, 
+                    expense: 0 
+                },
+                { 
+                    label: `Siklus T-0 (Hari Ini - ${formatDisplayDate(today)})`, 
+                    dateKey: formatDateKey(today), 
+                    income: 0, 
+                    expense: totalExpense 
+                }
             ];
 
+            // Hitung pemasukan riil per tanggal dari seluruh data transaksi
+            ordersList.forEach(o => {
+                const amt = Number(o.total) || 0;
+                let orderDateKey = '';
+
+                if (o.date) {
+                    const parsed = new Date(o.date);
+                    if (!isNaN(parsed.getTime())) {
+                        orderDateKey = formatDateKey(parsed);
+                    } else {
+                        // Antisipasi format DD/MM/YYYY atau DD-MM-YYYY
+                        const parts = String(o.date).split(/[-/]/);
+                        if (parts.length === 3) {
+                            if (parts[0].length === 4) {
+                                orderDateKey = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+                            } else {
+                                orderDateKey = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                            }
+                        }
+                    }
+                }
+
+                // Cocokkan ke masing-masing hari
+                const match = daysData.find(d => d.dateKey === orderDateKey);
+                if (match) {
+                    match.income += amt;
+                } else {
+                    // Jika transaksi baru / tanggal hari ini
+                    daysData[2].income += amt;
+                }
+            });
+
+            // Cari nilai max sebagai acuan bar 100%
             const maxVal = Math.max(...daysData.map(d => Math.max(d.income, d.expense)), 100000);
 
             daysData.forEach(d => {
@@ -626,18 +701,21 @@
                 row.className = 'border-b border-slate-700/50 pb-4 last:border-none last:pb-0';
                 row.innerHTML = `
                     <div class="flex justify-between items-center mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        <span>${d.label}</span>
-                        <span class="text-slate-500 font-normal">In: <strong class="text-brand-cyan">${formatRupiah(d.income)}</strong> | Out: <strong class="text-brand-danger">${formatRupiah(d.expense)}</strong></span>
+                        <span><i class="fa-solid fa-wave-square text-brand-cyan mr-1.5"></i>${d.label}</span>
+                        <span class="text-slate-500 font-normal">
+                            In: <strong class="text-brand-cyan font-mono">${formatRupiah(d.income)}</strong> | 
+                            Out: <strong class="text-brand-danger font-mono">${formatRupiah(d.expense)}</strong>
+                        </span>
                     </div>
                     <div class="space-y-2.5">
                         <div>
-                            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-brand-cyan h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_#00f2fe]" style="width: ${incPercent}%"></div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-brand-cyan h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_#00f2fe]" style="width: ${incPercent}%"></div>
                             </div>
                         </div>
                         <div>
-                            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-brand-danger h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_#ef4444]" style="width: ${expPercent}%"></div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-brand-danger h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_#ef4444]" style="width: ${expPercent}%"></div>
                             </div>
                         </div>
                     </div>
@@ -787,7 +865,6 @@
             const sizesInput = document.getElementById('inp-sizes').value;
             const sizesArray = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(Boolean) : [];
             
-            // Proses URL Video
             const rawVideoUrl = document.getElementById('inp-video').value;
             const extractedId = extractVideoID(rawVideoUrl); 
 
@@ -818,14 +895,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             autoInjectDataGuru();
 
-            // --- KODE FORCE OVERWRITE (PAKSA TIMPA) ---
-            // Kode ini akan menimpa database secara ekstrim berdasarkan kode unik (UTX-5070 & UTX-5090-ROG).
-            // Tujuannya agar apapun salah ketik di masa lalu, otomatis 100% jadi nama file yang valid.
+            // KODE FORCE OVERWRITE
             let existingMem = JSON.parse(localStorage.getItem('utx_products'));
             if(existingMem) {
                 let isPatched = false;
                 existingMem.forEach(p => {
-                    // Paksa timpa nama file untuk RTX 5070
                     if(p.code === "UTX-5070") {
                         if(p.ytVideoUrl !== "rtx_5070vid.mp4" || p.imageUrl !== "rtx_5070.jpg") {
                             p.ytVideoUrl = "rtx_5070vid.mp4";
@@ -833,7 +907,6 @@
                             isPatched = true;
                         }
                     }
-                    // Paksa timpa nama file untuk RTX 5090
                     if(p.code === "UTX-5090-ROG") {
                         if(p.ytVideoUrl !== "rtx_5090_rog_edisi_dhabab.mp4" || p.imageUrl !== "rtx_5090.jpg") {
                             p.ytVideoUrl = "rtx_5090_rog_edisi_dhabab.mp4";
@@ -843,16 +916,21 @@
                     }
                 });
                 
-                // Simpan ulang ke memori browser
                 if(isPatched) {
                     localStorage.setItem('utx_products', JSON.stringify(existingMem));
                     console.log("Database berhasil dipaksa sinkron dengan file GitHub!");
                 }
             }
-            // ------------------------------------------
 
             renderAdminData();
             initAdminProfile();
+
+            // LISTENER REAL-TIME UNTUK AKTIVITAS MULTI-TAB/WINDOW
+            window.addEventListener('storage', (e) => {
+                if (['utx_orders', 'utx_expenses', 'utx_products', 'utx_customers'].includes(e.key)) {
+                    renderAdminData();
+                }
+            });
         });
     </script>
 </body>
