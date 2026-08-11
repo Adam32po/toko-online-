@@ -47,7 +47,6 @@
         .view-hidden { display: none !important; }
         .hero-overlay { background: linear-gradient(to right, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.7)); }
         
-      
         .neon-text { text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
         .neon-border { box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
     </style>
@@ -65,7 +64,6 @@
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <button class="md:hidden text-2xl text-brand-cyan" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></button>
             
-           
             <h1 class="text-xl md:text-2xl font-sans font-bold text-white tracking-wide cursor-pointer flex items-center gap-2" onclick="showCustomerSection('cust-home')">
                 <i class="fa-solid fa-microchip text-brand-cyan"></i> GadgetStore Pro UTX
             </h1>
@@ -97,7 +95,7 @@
     </header>
 
     <main class="flex-1">
-       
+        
         <div id="cust-home" class="customer-section fade-in pb-20">
             <section class="relative h-[70vh] bg-brand-darker flex items-center justify-center overflow-hidden border-b border-slate-800">
                 <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=2000&q=80" alt="Hero" class="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40">
@@ -126,7 +124,8 @@
         
         <div id="cust-detail" class="customer-section view-hidden fade-in pb-20">
             <div class="max-w-7xl mx-auto px-6 mt-10 md:mt-16">
-                <button onclick="showCustomerSection('cust-home')" class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-brand-cyan mb-8 flex items-center gap-2 bg-slate-900 px-4 py-2 rounded shadow-sm w-max border border-slate-700 transition-colors"><i class="fa-solid fa-arrow-left"></i> Return to Database</button>
+                <!-- Tombol kembali diupdate pakai closeProductDetail -->
+                <button onclick="closeProductDetail()" class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-brand-cyan mb-8 flex items-center gap-2 bg-slate-900 px-4 py-2 rounded shadow-sm w-max border border-slate-700 transition-colors"><i class="fa-solid fa-arrow-left"></i> Return to Database</button>
                 
                 <div class="flex flex-col lg:flex-row gap-12 bg-brand-card p-8 md:p-12 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-slate-700">
                     
@@ -159,7 +158,7 @@
                         
                         <p class="text-slate-400 text-sm leading-relaxed mb-6">High-performance component dirancang untuk arsitektur next-gen. Memastikan stabilitas sistem dan frame-rate maksimal untuk gaming dan produktivitas kelas berat.</p>
                         
-                       
+                        
                         <div class="mb-8 border-t border-b border-slate-700 py-4 bg-slate-900/30 px-4 rounded">
                             <span class="block text-[10px] uppercase tracking-widest mb-3 font-bold text-slate-500"><i class="fa-solid fa-microchip text-brand-cyan mr-1"></i> Spesifikasi / Varian</span>
                             <div id="detail-specs" class="flex flex-wrap gap-2">
@@ -167,7 +166,7 @@
                             </div>
                         </div>
                         
-                       
+                        
                         <button id="btn-add-cart" class="w-full bg-brand-cyan text-brand-darker py-4 rounded font-tech text-lg font-bold uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_15px_rgba(0,242,254,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] flex justify-center items-center gap-2">
                             <i class="fa-solid fa-cart-plus"></i> Inject to Cart
                         </button>
@@ -540,9 +539,12 @@
             products.forEach(p => {
                 const isSoldOut = (p.stock === 0 || p.stock === undefined);
                 
-                const videoBadge = p.ytVideoId 
-                    ? `<span class="absolute top-3 right-3 bg-red-600/90 text-white text-[9px] px-2 py-1 rounded border border-red-400 flex items-center gap-1 z-20 shadow-[0_0_10px_#ef4444] font-bold tracking-widest"><i class="fa-brands fa-youtube"></i> VIDEO SHOWCASE</span>` 
-                    : '';
+                let videoBadge = '';
+                if (p.ytVideoId) {
+                    videoBadge = `<span class="absolute top-3 right-3 bg-red-600/90 text-white text-[9px] px-2 py-1 rounded border border-red-400 flex items-center gap-1 z-20 shadow-[0_0_10px_#ef4444] font-bold tracking-widest"><i class="fa-brands fa-youtube"></i> YOUTUBE</span>`;
+                } else if (p.ytVideoUrl) {
+                    videoBadge = `<span class="absolute top-3 right-3 bg-blue-600/90 text-white text-[9px] px-2 py-1 rounded border border-blue-400 flex items-center gap-1 z-20 shadow-[0_0_10px_#3b82f6] font-bold tracking-widest"><i class="fa-solid fa-film"></i> VIDEO</span>`;
+                }
 
                 const card = document.createElement('div');
                 card.className = 'group cursor-pointer bg-brand-card rounded-lg p-4 border border-slate-700 hover:border-brand-cyan hover:shadow-[0_0_20px_rgba(0,242,254,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col h-full';
@@ -579,13 +581,20 @@
             document.getElementById('detail-name').innerText = product.name;
             document.getElementById('detail-price').innerText = formatRupiah(product.price);
             
-           
             const videoContainer = document.getElementById('detail-video-container');
             const videoFrame = document.getElementById('detail-video-frame');
-            if(product.ytVideoId) {
+            
+            if (product.ytVideoId) {
                 videoContainer.classList.remove('hidden');
                 videoContainer.classList.add('flex');
-                videoFrame.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${product.ytVideoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                videoFrame.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${product.ytVideoId}?autoplay=1&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            } else if (product.ytVideoUrl) {
+                videoContainer.classList.remove('hidden');
+                videoContainer.classList.add('flex');
+                videoFrame.innerHTML = `<video class="w-full h-full object-cover" controls autoplay muted loop>
+                                            <source src="${product.ytVideoUrl}" type="video/mp4">
+                                            Browser Anda tidak mendukung tag video.
+                                        </video>`;
             } else {
                 videoContainer.classList.add('hidden');
                 videoContainer.classList.remove('flex');
@@ -612,7 +621,6 @@
                 addCartBtn.disabled = false;
             }
             
-            
             const specsContainer = document.getElementById('detail-specs');
             specsContainer.innerHTML = '';
             if(product.sizes && product.sizes.length > 0) {
@@ -625,7 +633,6 @@
             } else {
                 specsContainer.innerHTML = '<span class="text-xs text-slate-500 italic font-mono">- Standard Edition -</span>';
             }
-
 
             addCartBtn.onclick = () => {
                 if (isSoldOut) return showToast('Error: Inventori kosong!', 'error');
