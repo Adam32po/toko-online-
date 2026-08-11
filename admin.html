@@ -183,15 +183,23 @@
             </div>
 
             
-            <div id="admin-input" class="admin-section view-hidden fade-in">
-                <div class="max-w-3xl bg-brand-card p-8 rounded-lg border border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                    <div class="flex items-center gap-3 mb-8 border-b border-slate-700 pb-4">
-                        <div class="w-10 h-10 rounded bg-brand-cyan/20 flex items-center justify-center text-brand-cyan"><i class="fa-solid fa-folder-plus text-xl"></i></div>
-                        <div>
-                            <h3 class="font-tech text-2xl font-bold text-white tracking-wide">Register Part Baru</h3>
-                            <p class="text-xs text-slate-400">Masukkan data GPU atau komponen PC ke database UTX.</p>
-                        </div>
-                    </div>
+          <!-- Input Gambar & Video Lokal / YouTube -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+    <!-- Gambar -->
+    <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-brand-blue transition-colors">
+        <label class="text-[10px] uppercase tracking-widest text-brand-blue font-bold block mb-2"><i class="fa-regular fa-image mr-1"></i> Nama File Gambar *</label>
+        <input type="text" id="inp-image" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-brand-blue text-white" required placeholder="rtx_5090.jpg">
+        <p class="text-[9px] text-slate-500 mt-2">rtx_5090.jpg</p>
+    </div>
+    
+    <!-- Video -->
+    <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-red-500 transition-colors relative overflow-hidden">
+        <div class="absolute -right-4 -bottom-4 text-red-500/10"><i class="fa-solid fa-video text-7xl"></i></div>
+        <label class="text-[10px] uppercase tracking-widest text-red-400 font-bold block mb-2 relative z-10"><i class="fa-solid fa-video mr-1"></i> Nama File Video / Link YouTube</label>
+        <input type="text" id="inp-video" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-red-500 text-white relative z-10" placeholder="rtx rog 5090 dhabab edisi.mp4 atau Link YT">
+        <p class="text-[9px] text-slate-500 mt-2 relative z-10">rtx rog 5090 dhabab edisi.mp4</p>
+    </div>
+</div>
                     
                     <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
