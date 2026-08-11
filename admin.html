@@ -52,23 +52,23 @@
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
-       
+        /* Sidebar active state styling */
         .nav-btn.active { background: rgba(0, 242, 254, 0.1); border-right: 3px solid #00f2fe; color: #00f2fe; }
     </style>
 </head>
 <body class="font-sans bg-[#050b14] text-gray-300 antialiased bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
 
-    
+    <!-- Global Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-brand-darker border-l-4 border-brand-cyan text-white px-6 py-4 rounded shadow-[0_0_15px_rgba(0,242,254,0.4)] transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm">
         <i id="toast-icon" class="fa-solid fa-check-circle text-brand-cyan"></i>
         <span id="toast-message">Notifikasi</span>
     </div>
 
     <div class="min-h-screen flex flex-col md:flex-row">
-        
+        <!-- Sidebar -->
         <aside class="w-full md:w-64 bg-brand-darker border-r border-slate-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-20">
             <div class="p-8 border-b border-slate-800 relative overflow-hidden bg-brand-dark">
-               
+                <!-- Glitch/Cyber pattern overlay -->
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 
                 <div class="relative z-10 flex items-center gap-3">
@@ -104,10 +104,10 @@
             </div>
         </aside>
 
-       
+        <!-- Main Content -->
         <main class="flex-1 p-8 md:p-12 overflow-y-auto">
             
-           
+            <!-- Dashboard -->
             <div id="admin-dash" class="admin-section fade-in">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                     <div>
@@ -164,7 +164,7 @@
                 </div>
             </div>
 
-            
+            <!-- Database Produk (Katalog) -->
             <div id="admin-products" class="admin-section view-hidden fade-in">
                 <div class="flex justify-between items-center mb-8">
                     <div>
@@ -182,24 +182,16 @@
                 </div>
             </div>
 
-            
-          <!-- Input Gambar & Video Lokal / YouTube -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-    <!-- Gambar -->
-    <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-brand-blue transition-colors">
-        <label class="text-[10px] uppercase tracking-widest text-brand-blue font-bold block mb-2"><i class="fa-regular fa-image mr-1"></i> Nama File Gambar *</label>
-        <input type="text" id="inp-image" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-brand-blue text-white" required placeholder="rtx_5090.jpg">
-        <p class="text-[9px] text-slate-500 mt-2">rtx_5090.jpg</p>
-    </div>
-    
-    <!-- Video -->
-    <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-red-500 transition-colors relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 text-red-500/10"><i class="fa-solid fa-video text-7xl"></i></div>
-        <label class="text-[10px] uppercase tracking-widest text-red-400 font-bold block mb-2 relative z-10"><i class="fa-solid fa-video mr-1"></i> Nama File Video / Link YouTube</label>
-        <input type="text" id="inp-video" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-red-500 text-white relative z-10" placeholder="rtx rog 5090 dhabab edisi.mp4 atau Link YT">
-        <p class="text-[9px] text-slate-500 mt-2 relative z-10">rtx rog 5090 dhabab edisi.mp4</p>
-    </div>
-</div>
+            <!-- Input Barang (Dengan Input Video) -->
+            <div id="admin-input" class="admin-section view-hidden fade-in">
+                <div class="max-w-3xl bg-brand-card p-8 rounded-lg border border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                    <div class="flex items-center gap-3 mb-8 border-b border-slate-700 pb-4">
+                        <div class="w-10 h-10 rounded bg-brand-cyan/20 flex items-center justify-center text-brand-cyan"><i class="fa-solid fa-folder-plus text-xl"></i></div>
+                        <div>
+                            <h3 class="font-tech text-2xl font-bold text-white tracking-wide">Register Part Baru</h3>
+                            <p class="text-xs text-slate-400">Masukkan data GPU atau komponen PC ke database UTX.</p>
+                        </div>
+                    </div>
                     
                     <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -230,13 +222,13 @@
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-                          
+                            <!-- Image URL -->
                             <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-brand-blue transition-colors">
                                 <label class="text-[10px] uppercase tracking-widest text-brand-blue font-bold block mb-2"><i class="fa-regular fa-image mr-1"></i> URL Gambar (Thumbnail) *</label>
                                 <input type="url" id="inp-image" class="w-full bg-transparent border-b border-slate-600 outline-none text-sm py-2 focus:border-brand-blue text-white" required placeholder="https://link-gambar.jpg">
                             </div>
                             
-                            
+                            <!-- Video URL (NEW FEATURE) -->
                             <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-red-500 transition-colors relative overflow-hidden">
                                 <div class="absolute -right-4 -bottom-4 text-red-500/10"><i class="fa-brands fa-youtube text-7xl"></i></div>
                                 <label class="text-[10px] uppercase tracking-widest text-red-400 font-bold block mb-2 relative z-10"><i class="fa-brands fa-youtube mr-1"></i> URL Video YouTube (Opsional)</label>
@@ -254,7 +246,7 @@
                 </div>
             </div>
 
-            
+            <!-- History Akun Customer -->
             <div id="admin-history" class="admin-section view-hidden fade-in">
                 <div class="flex justify-between items-end mb-8 border-b border-slate-700 pb-4">
                     <div>
@@ -293,7 +285,7 @@
                 </div>
             </div>
 
-            
+            <!-- Data Pelanggan (Transaksi & Pengiriman) -->
             <div id="admin-customers" class="admin-section view-hidden fade-in">
                 <div class="mb-8 border-b border-slate-700 pb-4">
                     <h3 class="font-tech text-3xl font-bold text-white tracking-wide">LOGISTICS & <span class="text-brand-cyan">TRANSACTIONS</span></h3>
@@ -315,7 +307,7 @@
                 </div>
             </div>
 
-           
+            <!-- Laporan Produk -->
             <div id="admin-reports" class="admin-section view-hidden fade-in">
                 <div class="mb-8 border-b border-slate-700 pb-4">
                     <h3 class="font-tech text-3xl font-bold text-white tracking-wide">INVENTORY <span class="text-brand-cyan">ANALYTICS</span></h3>
@@ -324,7 +316,7 @@
                 <div class="bg-brand-card p-8 rounded-lg border border-slate-700 shadow-sm space-y-8 max-w-4xl" id="report-bars-container"></div>
             </div>
 
-           
+            <!-- Laporan Harian -->
             <div id="admin-daily" class="admin-section view-hidden fade-in">
                 <div class="mb-8 border-b border-slate-700 pb-4">
                     <h3 class="font-tech text-3xl font-bold text-white tracking-wide">FINANCIAL <span class="text-brand-cyan">LEDGER</span></h3>
@@ -332,14 +324,14 @@
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                   
+                    <!-- Inflow -->
                     <div class="bg-brand-card p-6 rounded-lg border border-slate-700 shadow-sm flex flex-col justify-center relative overflow-hidden group">
                         <div class="absolute right-0 bottom-0 text-brand-cyan/5"><i class="fa-solid fa-arrow-trend-up text-8xl"></i></div>
                         <p class="text-[10px] uppercase tracking-widest text-brand-cyan mb-2 font-bold relative z-10">Cash Inflow (Auto)</p>
                         <h4 class="text-2xl font-bold text-white font-mono relative z-10" id="daily-income">Rp 0</h4>
                     </div>
                     
-                   
+                    <!-- Outflow Input -->
                     <div class="bg-brand-card p-5 rounded-lg border border-slate-700 shadow-sm flex flex-col justify-center">
                         <p class="text-[10px] uppercase tracking-widest text-brand-danger mb-2 font-bold">Operational Outflow (Manual)</p>
                         <div class="flex items-center gap-2 border-b border-slate-600 focus-within:border-brand-danger transition-colors pb-1">
@@ -349,7 +341,7 @@
                         </div>
                     </div>
                     
-                    
+                    <!-- Net Profit -->
                     <div class="p-6 rounded-lg shadow-[0_0_20px_rgba(0,242,254,0.1)] bg-slate-900 border border-brand-cyan flex flex-col justify-center relative overflow-hidden">
                         <div class="absolute -top-4 -right-4 w-20 h-20 bg-brand-cyan rounded-full opacity-10 filter blur-xl"></div>
                         <p class="text-[10px] uppercase tracking-widest text-brand-cyan mb-2 font-bold relative z-10">Net Profit (Balance)</p>
@@ -401,7 +393,7 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active', 'bg-slate-800', 'text-white', 'border-r-[3px]', 'border-brand-cyan', 'text-brand-cyan');
                 btn.style.background = ''; 
-                if(!btn.classList.contains('bg-brand-cyan/10')) { 
+                if(!btn.classList.contains('bg-brand-cyan/10')) { // Abaikan tombol Add
                     btn.classList.add('text-slate-400');
                 }
             });
@@ -409,7 +401,7 @@
                 btnElement.classList.add('active', 'text-brand-cyan');
             }
 
-          
+            // Hide/Show sections
             document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
             document.getElementById(sectionId).classList.remove('view-hidden');
             
@@ -419,7 +411,7 @@
             if(sectionId === 'admin-customers') renderOrdersTable();
         };
 
-        
+        // Fungsi ekstrak ID YouTube dari link apapun
         const extractVideoID = (url) => {
             let videoID = "";
             if(url) {
@@ -475,7 +467,7 @@
                 const isSoldOut = (p.stock === 0 || p.stock === undefined);
                 const sizesText = p.sizes ? p.sizes.join(', ') : '-';
                 
-             
+                // Cek apakah ada ID Video
                 const videoBadge = p.ytVideoId 
                     ? `<span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-brands fa-youtube"></i> Video Tersedia</span>` 
                     : '';
@@ -741,7 +733,7 @@
             const sizesInput = document.getElementById('inp-sizes').value;
             const sizesArray = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(Boolean) : [];
             
-           
+            // Proses URL Video
             const rawVideoUrl = document.getElementById('inp-video').value;
             const extractedId = extractVideoID(rawVideoUrl);
 
@@ -754,8 +746,8 @@
                 sold: 0,
                 imageUrl: document.getElementById('inp-image').value,
                 sizes: sizesArray,
-                ytVideoUrl: rawVideoUrl,       
-                ytVideoId: extractedId         
+                ytVideoUrl: rawVideoUrl,        // Simpan URL asli (opsional)
+                ytVideoId: extractedId         // Simpan ID agar gampang di-embed
             };
 
             products.push(newProduct);
@@ -765,7 +757,7 @@
             showToast('Data hardware berhasil ditulis ke database utama!');
             e.target.reset();
             
-            
+            // Kembali ke menu Produk
             showAdminMenu('admin-products', document.querySelectorAll('.nav-btn')[1]);
         };
 
