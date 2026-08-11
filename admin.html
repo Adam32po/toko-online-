@@ -356,7 +356,7 @@
         let orders = [];
         let savedExpense = 0;
 
-        // INJEKSI DATA DEFAULT (TOTAL 4 HARDWARE RESMI GITHUB)
+        // INJEKSI DATA DEFAULT DENGAN HARGA PASAR TERBARU
         const autoInjectDataGuru = () => {
             let existingProducts = JSON.parse(localStorage.getItem('utx_products')) || [];
             
@@ -365,7 +365,7 @@
                     id: 1700000000001,
                     code: "UTX-5070",
                     name: "NVIDIA RTX 5070 (Pre-Loaded)",
-                    price: 12500000,
+                    price: 55500000,
                     stock: 25,
                     sold: 0,
                     imageUrl: "rtx_5070.jpg",
@@ -377,7 +377,7 @@
                     id: 1700000000002,
                     code: "UTX-5090-ROG",
                     name: "ROG RTX 5090 DHABAB EDITION (LIMITED)",
-                    price: 35999000,
+                    price: 155200000,
                     stock: 10,
                     sold: 0,
                     imageUrl: "rtx_5090.jpg",
@@ -389,7 +389,7 @@
                     id: 1700000000003,
                     code: "UTX-5070TI-FRIEREN",
                     name: "ROG RTX 5070 Ti FRIEREN EDITION",
-                    price: 18500000,
+                    price: 22500000,
                     stock: 15,
                     sold: 0,
                     imageUrl: "rtx_5070_ti_frieren.jpg",
@@ -401,7 +401,7 @@
                     id: 1700000000004,
                     code: "UTX-5080-MIKU",
                     name: "RTX 5080 HATSUNE MIKU EDITION (LIMITED)",
-                    price: 26500000,
+                    price: 83300000,
                     stock: 12,
                     sold: 0,
                     imageUrl: "rtx_5080_miku.jpg",
@@ -413,9 +413,8 @@
 
             if (existingProducts.length === 0) {
                 localStorage.setItem('utx_products', JSON.stringify(defaultProducts));
-                console.log("Auto-inject 4 produk awal berhasil.");
+                console.log("Auto-inject produk dengan harga pasar baru berhasil.");
             } else {
-                // Jika sudah ada data lama, tambahkan produk yang belum ada otomatis
                 let isUpdated = false;
                 defaultProducts.forEach(def => {
                     const found = existingProducts.some(p => p.code === def.code);
@@ -930,44 +929,40 @@
         document.addEventListener('DOMContentLoaded', () => {
             autoInjectDataGuru();
 
-            // KODE FORCE OVERWRITE & SINKRONISASI 4 PRODUK
+            // KODE FORCE OVERWRITE, SINKRONISASI ASSET & HARGA TERBARU
             let existingMem = JSON.parse(localStorage.getItem('utx_products'));
             if(existingMem) {
                 let isPatched = false;
                 existingMem.forEach(p => {
                     if(p.code === "UTX-5070") {
-                        if(p.ytVideoUrl !== "rtx_5070vid.mp4" || p.imageUrl !== "rtx_5070.jpg") {
-                            p.ytVideoUrl = "rtx_5070vid.mp4";
-                            p.imageUrl = "rtx_5070.jpg";
-                            isPatched = true;
-                        }
+                        p.ytVideoUrl = "rtx_5070vid.mp4";
+                        p.imageUrl = "rtx_5070.jpg";
+                        p.price = 55500000;
+                        isPatched = true;
                     }
                     if(p.code === "UTX-5090-ROG") {
-                        if(p.ytVideoUrl !== "rtx_5090_rog_edisi_dhabab.mp4" || p.imageUrl !== "rtx_5090.jpg") {
-                            p.ytVideoUrl = "rtx_5090_rog_edisi_dhabab.mp4";
-                            p.imageUrl = "rtx_5090.jpg";
-                            isPatched = true;
-                        }
+                        p.ytVideoUrl = "rtx_5090_rog_edisi_dhabab.mp4";
+                        p.imageUrl = "rtx_5090.jpg";
+                        p.price = 155200000;
+                        isPatched = true;
                     }
                     if(p.code === "UTX-5070TI-FRIEREN") {
-                        if(p.ytVideoUrl !== "rtx_5070_ti_frieren.mp4" || p.imageUrl !== "rtx_5070_ti_frieren.jpg") {
-                            p.ytVideoUrl = "rtx_5070_ti_frieren.mp4";
-                            p.imageUrl = "rtx_5070_ti_frieren.jpg";
-                            isPatched = true;
-                        }
+                        p.ytVideoUrl = "rtx_5070_ti_frieren.mp4";
+                        p.imageUrl = "rtx_5070_ti_frieren.jpg";
+                        p.price = 22500000;
+                        isPatched = true;
                     }
                     if(p.code === "UTX-5080-MIKU") {
-                        if(p.ytVideoUrl !== "rtx_5080_miku.mp4" || p.imageUrl !== "rtx_5080_miku.jpg") {
-                            p.ytVideoUrl = "rtx_5080_miku.mp4";
-                            p.imageUrl = "rtx_5080_miku.jpg";
-                            isPatched = true;
-                        }
+                        p.ytVideoUrl = "rtx_5080_miku.mp4";
+                        p.imageUrl = "rtx_5080_miku.jpg";
+                        p.price = 83300000;
+                        isPatched = true;
                     }
                 });
                 
                 if(isPatched) {
                     localStorage.setItem('utx_products', JSON.stringify(existingMem));
-                    console.log("Database berhasil dipaksa sinkron dengan file GitHub!");
+                    console.log("Database & Harga Pasar berhasil dipaksa sinkron!");
                 }
             }
 
