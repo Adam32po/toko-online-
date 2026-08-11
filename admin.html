@@ -371,7 +371,8 @@
                         sold: 0,
                         imageUrl: "rtx_5070.jpg",
                         sizes: ["12GB GDDR7", "Standard Edition"],
-                        ytVideoUrl: "rtxx_5070vid.mp4",
+                        // NAMA FILE SUDAH DIPERBAIKI DISINI
+                        ytVideoUrl: "rtx_5070vid.mp4",
                         ytVideoId: ""
                     },
                     {
@@ -533,7 +534,6 @@
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-brand-cyan mr-3 font-mono text-xs">${p.sold || 0} terjual</span>
                             
-                            <!-- TOMBOL BARU UNTUK EDIT HARGA -->
                             <button onclick="editProductPrice(${p.id})" class="bg-slate-800 border border-slate-600 hover:border-brand-blue hover:text-brand-blue text-slate-300 text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded font-bold transition flex items-center gap-1" title="Ubah Harga Jual">
                                 <i class="fa-solid fa-tag"></i> Harga
                             </button>
@@ -551,7 +551,6 @@
             });
         };
 
-        // --- FUNGSI BARU UNTUK EDIT HARGA ---
         const editProductPrice = (id) => {
             let products = JSON.parse(localStorage.getItem('utx_products')) || [];
             let p = products.find(prod => prod.id === id);
@@ -822,6 +821,27 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Panggil injeksi data pertama kali
             autoInjectDataGuru();
+
+            // --- KODE AUTO-PATCH (PENYEMBUH TYPO OTOMATIS) ---
+            // Kode ini akan diam-diam mengecek memori browsermu dan langsung
+            // memperbaiki nama file yang salah ketik (double x atau yang lainnya)
+            let existingMem = JSON.parse(localStorage.getItem('utx_products'));
+            if(existingMem) {
+                let isPatched = false;
+                existingMem.forEach(p => {
+                    // Jika terdeteksi ada typo nama file video rtx 5070 di memori browser
+                    if(p.ytVideoUrl === "rtxx_5070vid.mp4" || p.ytVideoUrl === "rtx_5070.mp4") {
+                        p.ytVideoUrl = "rtx_5070vid.mp4"; // Diperbaiki otomatis!
+                        isPatched = true;
+                    }
+                });
+                
+                // Jika tadi ada yang diperbaiki, simpan ulang memorinya
+                if(isPatched) {
+                    localStorage.setItem('utx_products', JSON.stringify(existingMem));
+                }
+            }
+            // --------------------------------------------------
             
             renderAdminData();
             initAdminProfile();
