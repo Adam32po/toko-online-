@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GadgetStore Pro UTX - Login Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        tech: ['Rajdhani', 'sans-serif'] // Font futuristik untuk heading
+                    },
+                    colors: { 
+                        brand: { 
+                            cyan: '#00f2fe', 
+                            blue: '#4facfe', 
+                            dark: '#0f172a', // Slate 900
+                            darker: '#020617', // Slate 950
+                            card: '#1e293b', // Slate 800
+                            danger: '#ef4444' 
+                        } 
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        input[type="checkbox"] { accent-color: #00f2fe; width: 14px; height: 14px; cursor: pointer; }
+        .hidden-form { display: none !important; }
+        
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* Neon Glow Effect on Focus */
+        .neon-focus:focus-within {
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+            border-color: #00f2fe;
+        }
+    </style>
+</head>
+<body class="font-sans bg-[#050b14] text-gray-300 antialiased min-h-screen flex items-center justify-center p-4 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+
+    <!-- Global Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 px-6 py-3 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm border-l-4">
+        <i id="toast-icon" class="fa-solid fa-check-circle"></i>
+        <span id="toast-message">Notifikasi</span>
+    </div>
+
+    <!-- Main Card Container -->
+    <div class="w-full max-w-[950px] bg-brand-darker shadow-[0_0_40px_rgba(0,242,254,0.05)] rounded-2xl overflow-hidden flex flex-col md:flex-row relative z-10 border border-slate-800">
+        
+        <!-- Left Panel (Image & Branding) -->
+        <div class="w-full md:w-5/12 relative p-10 md:p-12 flex flex-col justify-between min-h-[300px] md:min-h-[600px] border-r border-slate-800">
+            <!-- GPU Image Background -->
+            <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80" class="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-luminosity">
+            <div class="absolute inset-0 bg-gradient-to-b from-brand-darker/80 via-transparent to-brand-darker z-0"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-brand-darker/90 to-transparent z-0"></div>
+
+            <!-- Logo -->
+            <div class="relative z-10 flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-microchip text-brand-cyan text-2xl"></i>
+                    <span class="font-tech font-bold tracking-[0.1em] text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-brand-blue text-xl md:text-2xl uppercase">GadgetStore Pro UTX</span>
+                </div>
+            </div>
+
+            <!-- Welcome Text -->
+            <div class="relative z-10 mt-16 md:mt-auto">
+                <div class="inline-block px-3 py-1 border border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan text-[10px] font-bold tracking-widest rounded-sm mb-4 backdrop-blur-sm">HIGH PERFORMANCE COMPUTING</div>
+                <h1 id="welcome-title" class="font-tech text-4xl md:text-5xl font-bold text-white mb-4 leading-tight tracking-tight shadow-black drop-shadow-md">Unleash<br>The Power.</h1>
+                <p id="welcome-desc" class="text-xs md:text-sm text-slate-400 mb-8 leading-relaxed max-w-xs">Destinasi utama untuk GPU next-gen dan komponen PC antusias. Masuk untuk merakit mesin impianmu.</p>
+                
+                <button type="button" onclick="toggleAdminView()" id="toggle-btn" class="group flex items-center gap-2 border border-slate-600 text-slate-300 px-6 py-2.5 rounded-md text-xs font-semibold hover:border-brand-cyan hover:text-brand-cyan transition-all duration-300 bg-slate-900/50 backdrop-blur-sm">
+                    <i class="fa-solid fa-terminal text-[10px] group-hover:animate-pulse"></i> 
+                    <span id="toggle-btn-text">Terminal Admin</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Panel (Forms) -->
+        <div class="w-full md:w-7/12 p-8 md:p-12 flex flex-col justify-center bg-brand-dark relative overflow-hidden">
+            
+            <!-- FORM 1: CUSTOMER LOGIN -->
+            <form id="customer-login-form" onsubmit="handleCustomerLogin(event)" class="space-y-4 fade-in">
+                <div class="mb-8">
+                    <h2 class="font-tech text-3xl font-bold text-white tracking-wide">User Authentication</h2>
+                    <p class="text-xs text-slate-400 mt-1">Masukkan kredensial untuk mengakses katalog GadgetStore Pro UTX.</p>
+                </div>
+
+                <div class="bg-brand-card p-3 px-5 rounded-lg border border-slate-700 transition-colors neon-focus">
+                    <label class="block text-[10px] text-brand-cyan font-bold uppercase tracking-wider mb-1">ID Pengguna / Nickname</label>
+                    <input type="text" id="login-nick" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-500" placeholder="Masukkan ID" required>
+                </div>
+                
+                <div class="bg-brand-card p-3 px-5 rounded-lg border border-slate-700 transition-colors neon-focus">
+                    <label class="block text-[10px] text-brand-cyan font-bold uppercase tracking-wider mb-1">Password</label>
+                    <div class="flex items-center w-full">
+                        <input type="password" id="login-pass" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-500" placeholder="••••••••" required>
+                        <button type="button" onclick="togglePassword('login-pass', this)" class="text-slate-500 hover:text-brand-cyan focus:outline-none transition-colors ml-2">
+                            <i class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center px-1 py-2 mb-2">
+                    <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"><input type="checkbox" checked> Ingat sesi ini</label>
+                    <a href="#" class="text-xs text-slate-400 hover:text-brand-cyan transition-colors">Lupa Password?</a>
+                </div>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-brand-cyan to-brand-blue text-brand-darker py-3.5 rounded-lg font-bold text-sm hover:shadow-[0_0_20px_rgba(0,242,254,0.4)] transition-all uppercase tracking-wide">
+                    Login Sistem
+                </button>
+                
+                <!-- GUEST LOGIN -->
+                <div class="relative flex py-4 items-center">
+                    <div class="flex-grow border-t border-slate-700"></div>
+                    <span class="flex-shrink-0 mx-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest">Atau</span>
+                    <div class="flex-grow border-t border-slate-700"></div>
+                </div>
+                
+                <button type="button" onclick="handleGuestLogin()" class="w-full bg-slate-800 text-slate-300 py-3 rounded-lg font-bold text-sm border border-slate-700 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-astronaut"></i> Masuk sebagai Tamu
+                </button>
+
+                <div class="text-center mt-6">
+                    <p class="text-[11px] text-slate-400 font-medium mb-3">Belum memiliki akses?</p>
+                    <button type="button" onclick="switchCustomerForm('register')" class="w-full border border-slate-600 text-white py-3.5 rounded-lg font-bold text-sm hover:border-slate-400 hover:bg-slate-800 transition-colors">Registrasi Akun Baru</button>
+                </div>
+            </form>
+
+            <!-- FORM 2: CUSTOMER REGISTER -->
+            <form id="customer-register-form" onsubmit="handleCustomerRegister(event)" class="space-y-3 fade-in hidden-form">
+                <div class="mb-6">
+                    <h2 class="font-tech text-3xl font-bold text-white tracking-wide">Registrasi Akun</h2>
+                    <p class="text-xs text-slate-400 mt-1">Daftar untuk mendapatkan update stok GPU terbaru.</p>
+                </div>
+                
+                <div class="bg-brand-card p-2.5 px-4 rounded-lg border border-slate-700 transition-colors neon-focus">
+                    <label class="block text-[10px] text-brand-cyan font-bold uppercase tracking-wider mb-1">Nama Lengkap</label>
+                    <input type="text" id="reg-fullname" class="w-full outline-none text-sm font-medium text-white bg-transparent" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-brand-card p-2.5 px-4 rounded-lg border border-slate-700 transition-colors neon-focus">
+                        <label class="block text-[10px] text-brand-cyan font-bold uppercase tracking-wider mb-1">Nickname (Unik)</label>
+                        <input type="text" id="reg-nick" class="w-full outline-none text-sm font-medium text-white bg-transparent" required>
+                    </div>
+                    <div class="bg-brand-card p-2.5 px-4 rounded-lg border border-slate-700 transition-colors neon-focus">
+                        <label class="block text-[10px] text-brand-cyan font-bold uppercase tracking-wider mb-1">Alamat Email</label>
+                        <input type="email" id="reg-email" class="w-full outline-none text-sm font-medium text-white bg-transparent" required>
+                    </div>
+                </div>
+                
+                <div class="bg-brand-card p-2.5 px-4 rounded-lg border border-slate-700 transition-colors neon-focus">
+                    <label class="block text-[10px] text-brand-cyan font-bold uppercase tracking-wider mb-1">Buat Password</label>
+                    <div class="flex items-center w-full">
+                        <input type="password" id="reg-pass" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-500" placeholder="Min. 6 karakter" required minlength="6">
+                        <button type="button" onclick="togglePassword('reg-pass', this)" class="text-slate-500 hover:text-brand-cyan focus:outline-none transition-colors ml-2">
+                            <i class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-brand-cyan to-brand-blue text-brand-darker py-3.5 rounded-lg font-bold text-sm hover:shadow-[0_0_20px_rgba(0,242,254,0.4)] transition-all uppercase tracking-wide mt-4">Create Account</button>
+                
+                <div class="text-center mt-4">
+                    <button type="button" onclick="switchCustomerForm('login')" class="text-xs font-semibold text-slate-400 hover:text-brand-cyan transition-colors"><i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Login</button>
+                </div>
+            </form>
+
+            <!-- FORM 3: ADMIN LOGIN -->
+            <form id="admin-form" onsubmit="handleAdminLogin(event)" class="space-y-4 fade-in hidden-form">
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 class="font-tech text-3xl font-bold text-white tracking-wide">SYS<span class="text-brand-danger">ADMIN</span></h2>
+                        <p class="text-xs text-slate-400 mt-1">Terminal manajemen stok & operasional.</p>
+                    </div>
+                    <i class="fa-solid fa-server text-3xl text-slate-700"></i>
+                </div>
+
+                <div class="bg-brand-darker p-3 px-5 rounded-lg border border-slate-700 focus-within:border-brand-danger transition-colors">
+                    <label class="block text-[10px] text-brand-danger font-bold uppercase tracking-wider mb-1">Admin ID</label>
+                    <input type="text" id="admin-id" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-600" placeholder="ROOT-001" required>
+                </div>
+                
+                <div class="bg-brand-darker p-3 px-5 rounded-lg border border-slate-700 focus-within:border-brand-danger transition-colors">
+                    <label class="block text-[10px] text-brand-danger font-bold uppercase tracking-wider mb-1">Access Passkey</label>
+                    <div class="flex items-center w-full">
+                        <input type="password" id="admin-pass" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-600" placeholder="••••••••" required>
+                        <button type="button" onclick="togglePassword('admin-pass', this)" class="text-slate-500 hover:text-brand-danger focus:outline-none transition-colors ml-2">
+                            <i class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-brand-danger text-white py-3.5 rounded-lg font-bold text-sm shadow-[0_0_15px_rgba(239,68,68,0.2)] hover:bg-red-600 hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] transition-all uppercase tracking-wide mt-6 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Initialize Dashboard
+                </button>
+                
+                <div class="text-center mt-6 pt-6 border-t border-slate-800">
+                    <button type="button" onclick="switchAdminForm('register')" class="text-xs font-semibold text-slate-500 hover:text-white transition-colors">Register Security Key Baru</button>
+                </div>
+            </form>
+
+            <!-- FORM 4: ADMIN REGISTER -->
+            <form id="admin-register-form" onsubmit="handleAdminRegister(event)" class="space-y-3 fade-in hidden-form">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-tech text-2xl font-bold text-white">Setup Admin Key</h2>
+                    <span class="bg-brand-danger/20 text-brand-danger border border-brand-danger/50 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-shield-virus"></i> Encrypted</span>
+                </div>
+                
+                <!-- Input Simulasi Hardware ID/NFC -->
+                <div class="bg-[#0f172a] p-3 px-4 rounded-lg shadow-inner border-2 border-brand-danger border-dashed focus-within:border-solid transition-colors relative overflow-hidden">
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-brand-danger opacity-20"><i class="fa-solid fa-microchip text-4xl"></i></div>
+                    <label class="block text-[10px] text-brand-danger font-bold uppercase tracking-widest mb-1 relative z-10">Scan Hardware Token *</label>
+                    <input type="text" id="reg-admin-hardware" class="w-full outline-none text-sm font-bold text-white bg-transparent relative z-10 placeholder-slate-600" placeholder="Tap NFC / Input Token Key" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div class="bg-brand-darker p-2.5 px-4 rounded-lg border border-slate-700 focus-within:border-brand-danger transition-colors">
+                        <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">ID Sistem</label>
+                        <input type="text" id="reg-admin-id" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-600" placeholder="SYS-02" required>
+                    </div>
+                    <div class="bg-brand-darker p-2.5 px-4 rounded-lg border border-slate-700 focus-within:border-brand-danger transition-colors">
+                        <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Nama Ops</label>
+                        <input type="text" id="reg-admin-name" class="w-full outline-none text-sm font-medium text-white bg-transparent" required>
+                    </div>
+                </div>
+                
+                <div class="bg-brand-darker p-2.5 px-4 rounded-lg border border-slate-700 focus-within:border-brand-danger transition-colors">
+                    <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Passkey</label>
+                    <div class="flex items-center w-full">
+                        <input type="password" id="reg-admin-pass" class="w-full outline-none text-sm font-medium text-white bg-transparent placeholder-slate-600" placeholder="Min. 8 karakter" required minlength="8">
+                        <button type="button" onclick="togglePassword('reg-admin-pass', this)" class="text-slate-500 hover:text-brand-danger focus:outline-none transition-colors ml-2">
+                            <i class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-slate-700 text-white border border-slate-600 py-3.5 rounded-lg font-bold text-sm hover:bg-slate-600 hover:border-brand-danger hover:text-brand-danger transition-colors mt-4 uppercase tracking-wide">Write Security Key</button>
+                
+                <div class="text-center mt-4">
+                    <button type="button" onclick="switchAdminForm('login')" class="text-xs font-semibold text-slate-500 hover:text-slate-300 transition-colors"><i class="fa-solid fa-arrow-left mr-1"></i> Batal / Kembali</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        let isCustomerView = true;
+
+        // Inisialisasi Admin Default
+        const initDefaultAdmin = () => {
+            let admins = JSON.parse(localStorage.getItem('utx_admins'));
+            if(!admins || admins.length === 0) {
+                const defaultAdmin = [{ id: 'admin', name: 'Root Admin', pass: 'admin123', hardwareId: 'MASTER-UTX-KEY' }];
+                localStorage.setItem('utx_admins', JSON.stringify(defaultAdmin));
+            }
+        };
+        initDefaultAdmin();
+
+        // Custom Pop-up Toast
+        const showToast = (msg, type = 'success') => {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            
+            if(type === 'error') {
+                toast.className = "fixed top-5 right-5 bg-brand-darker border-l-4 border-brand-danger text-white px-6 py-4 rounded shadow-[0_0_15px_rgba(239,68,68,0.4)] transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm";
+                icon.className = "fa-solid fa-circle-exclamation text-brand-danger";
+            } else {
+                toast.className = "fixed top-5 right-5 bg-brand-darker border-l-4 border-brand-cyan text-white px-6 py-4 rounded shadow-[0_0_15px_rgba(0,242,254,0.4)] transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm";
+                icon.className = "fa-solid fa-check-circle text-brand-cyan";
+            }
+
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('-translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('-translate-y-20', 'opacity-0'), 3000);
+        };
+
+        // Switch between Admin & Customer Panel
+        function toggleAdminView() {
+            const custLoginForm = document.getElementById('customer-login-form');
+            const custRegForm = document.getElementById('customer-register-form');
+            const adminLoginForm = document.getElementById('admin-form');
+            const adminRegForm = document.getElementById('admin-register-form');
+            
+            const title = document.getElementById('welcome-title');
+            const desc = document.getElementById('welcome-desc');
+            const btnText = document.getElementById('toggle-btn-text');
+            const btnIcon = document.querySelector('#toggle-btn i');
+
+            if (isCustomerView) { 
+                // Beralih ke View Admin
+                custLoginForm.classList.add('hidden-form');
+                custRegForm.classList.add('hidden-form');
+                adminRegForm.classList.add('hidden-form');
+                adminLoginForm.classList.remove('hidden-form');
+                
+                title.innerHTML = 'System<br>Override.';
+                title.classList.replace('text-white', 'text-brand-danger');
+                desc.innerText = 'Akses terbatas. Otorisasi diperlukan untuk masuk ke sistem manajemen GadgetStore Pro UTX.';
+                btnText.innerText = 'User Portal';
+                btnIcon.className = "fa-solid fa-user text-[10px]";
+            } else { 
+                // Beralih ke View Customer
+                adminLoginForm.classList.add('hidden-form');
+                adminRegForm.classList.add('hidden-form');
+                custRegForm.classList.add('hidden-form');
+                custLoginForm.classList.remove('hidden-form');
+                
+                title.innerHTML = 'Unleash<br>The Power.';
+                title.classList.replace('text-brand-danger', 'text-white');
+                desc.innerText = 'Destinasi utama untuk GPU next-gen dan komponen PC antusias. Masuk untuk merakit mesin impianmu.';
+                btnText.innerText = 'Terminal Admin';
+                btnIcon.className = "fa-solid fa-terminal text-[10px] group-hover:animate-pulse";
+            }
+            isCustomerView = !isCustomerView;
+        }
+
+        // Switch Forms
+        function switchCustomerForm(target) {
+            document.getElementById('customer-login-form').classList.toggle('hidden-form', target === 'register');
+            document.getElementById('customer-register-form').classList.toggle('hidden-form', target === 'login');
+        }
+
+        function switchAdminForm(target) {
+            document.getElementById('admin-form').classList.toggle('hidden-form', target === 'register');
+            document.getElementById('admin-register-form').classList.toggle('hidden-form', target === 'login');
+        }
+
+        // Toggle Visibility Password
+        function togglePassword(inputId, btnElement) {
+            const input = document.getElementById(inputId);
+            const icon = btnElement.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+                icon.classList.add(inputId.includes('admin') ? 'text-brand-danger' : 'text-brand-cyan');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+                icon.classList.remove('text-brand-cyan', 'text-brand-danger');
+            }
+        }
+
+        // Handle Validasi & Registrasi Customer
+        function handleCustomerRegister(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('reg-fullname').value.trim();
+            const nick = document.getElementById('reg-nick').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+
+            let customers = JSON.parse(localStorage.getItem('utx_customers')) || [];
+            const isExist = customers.some(c => c.nickname === nick || c.email === email);
+            
+            if(isExist) {
+                showToast('Akses ditolak! ID atau Email sudah ada di database.', 'error');
+            } else {
+                const newCustomer = {
+                    fullName: fullName, nickname: nick, email: email, password: pass,
+                    dateJoin: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}),
+                    status: 'Active'
+                };
+
+                customers.push(newCustomer);
+                localStorage.setItem('utx_customers', JSON.stringify(customers));
+                
+                showToast('Akun berhasil dikonfigurasi! Silakan login.', 'success');
+                e.target.reset();
+                setTimeout(() => { switchCustomerForm('login'); }, 1500);
+            }
+        }
+
+        // Handle Customer Login
+        function handleCustomerLogin(e) {
+            e.preventDefault();
+            const nick = document.getElementById('login-nick').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            
+            let customers = JSON.parse(localStorage.getItem('utx_customers')) || [];
+            const user = customers.find(c => c.nickname === nick && c.password === pass);
+
+            if(user) {
+                localStorage.setItem('utx_current_customer', user.nickname);
+                localStorage.setItem('utx_active_user', user.nickname);
+                localStorage.setItem('utx_active_email', user.email || '');
+
+                showToast('Autentikasi Valid! Membuka portal...', 'success');
+                setTimeout(() => { window.location.href = 'customer.html'; }, 800);
+            } else {
+                showToast('Login Gagal! Kredensial tidak valid.', 'error');
+            }
+        }
+
+        // Handle Guest Login
+        function handleGuestLogin() {
+            localStorage.setItem('utx_current_customer', 'Guest');
+            localStorage.setItem('utx_active_user', 'Guest');
+            localStorage.setItem('utx_active_email', 'guest@gadgetstorepro.com');
+
+            showToast('Akses Tamu diaktifkan. Redirecting...', 'success');
+            setTimeout(() => { window.location.href = 'customer.html'; }, 800);
+        }
+
+        // Handle Registrasi Admin (Hardware ID)
+        function handleAdminRegister(e) {
+            e.preventDefault();
+            const hardwareId = document.getElementById('reg-admin-hardware').value.trim();
+            const id = document.getElementById('reg-admin-id').value.trim();
+            const name = document.getElementById('reg-admin-name').value.trim();
+            const pass = document.getElementById('reg-admin-pass').value.trim();
+
+            let admins = JSON.parse(localStorage.getItem('utx_admins')) || [];
+            
+            const isExist = admins.some(a => a.id === id);
+            const isHardwareExist = admins.some(a => a.hardwareId === hardwareId);
+            
+            if(isExist) {
+                showToast('ID Sistem telah digunakan admin lain!', 'error');
+            } else if (isHardwareExist) {
+                showToast('Hardware Token ini sudah terikat ke akun lain!', 'error');
+            } else {
+                admins.push({ id: id, name: name, pass: pass, hardwareId: hardwareId });
+                localStorage.setItem('utx_admins', JSON.stringify(admins));
+                
+                showToast('Security Key berhasil ditulis!', 'success');
+                e.target.reset();
+                setTimeout(() => { switchAdminForm('login'); }, 1500);
+            }
+        }
+
+        // Handle Admin Login
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const adminId = document.getElementById('admin-id').value.trim();
+            const adminPass = document.getElementById('admin-pass').value.trim();
+            
+            let admins = JSON.parse(localStorage.getItem('utx_admins')) || [];
+            const validAdmin = admins.find(a => a.id === adminId && a.pass === adminPass);
+
+            if(validAdmin) {
+                localStorage.setItem('utx_current_admin', validAdmin.name);
+                showToast('Otorisasi Diterima. Inisialisasi Sistem...', 'success');
+                setTimeout(() => { window.location.href = 'admin.html'; }, 800);
+            } else {
+                showToast('Akses Ditolak! Pelanggaran keamanan terdeteksi.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
