@@ -356,10 +356,8 @@
         let orders = [];
         let savedExpense = 0;
 
-        // --- SISTEM AUTO-INJECT DATABASE AWAL ---
         const autoInjectDataGuru = () => {
             let existingProducts = JSON.parse(localStorage.getItem('utx_products'));
-            // Jika database benar-benar kosong, otomatis masukkan 2 produk ini
             if (!existingProducts || existingProducts.length === 0) {
                 const produkAwal = [
                     {
@@ -371,7 +369,6 @@
                         sold: 0,
                         imageUrl: "rtx_5070.jpg",
                         sizes: ["12GB GDDR7", "Standard Edition"],
-                        // NAMA FILE SUDAH DIPERBAIKI DISINI
                         ytVideoUrl: "rtx_5070vid.mp4",
                         ytVideoId: ""
                     },
@@ -389,7 +386,7 @@
                     }
                 ];
                 localStorage.setItem('utx_products', JSON.stringify(produkAwal));
-                console.log("Auto-inject berhasil: Produk guru sudah ditambahkan.");
+                console.log("Auto-inject berhasil.");
             }
         };
 
@@ -502,7 +499,7 @@
                 if(p.ytVideoId) {
                     videoBadge = `<span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-brands fa-youtube"></i> YouTube URL</span>`;
                 } else if(p.ytVideoUrl) {
-                    videoBadge = `<span class="bg-blue-500/20 text-brand-blue text-[9px] px-1.5 py-0.5 rounded border border-blue-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-solid fa-film"></i> File Lokal</span>`;
+                    videoBadge = `<span class="bg-blue-500/20 text-brand-blue text-[9px] px-1.5 py-0.5 rounded border border-blue-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-solid fa-film"></i> File Lokal (<b>${p.ytVideoUrl}</b>)</span>`;
                 }
 
                 const tr = document.createElement('tr');
@@ -819,30 +816,41 @@
 
         // SAAT HALAMAN DIBUKA
         document.addEventListener('DOMContentLoaded', () => {
-            // Panggil injeksi data pertama kali
             autoInjectDataGuru();
 
-            // --- KODE AUTO-PATCH (PENYEMBUH TYPO OTOMATIS) ---
-            // Kode ini akan diam-diam mengecek memori browsermu dan langsung
-            // memperbaiki nama file yang salah ketik (double x atau yang lainnya)
+            // --- KODE FORCE OVERWRITE (PAKSA TIMPA) ---
+            // Kode ini akan menimpa database secara ekstrim berdasarkan kode unik (UTX-5070 & UTX-5090-ROG).
+            // Tujuannya agar apapun salah ketik di masa lalu, otomatis 100% jadi nama file yang valid.
             let existingMem = JSON.parse(localStorage.getItem('utx_products'));
             if(existingMem) {
                 let isPatched = false;
                 existingMem.forEach(p => {
-                    // Jika terdeteksi ada typo nama file video rtx 5070 di memori browser
-                    if(p.ytVideoUrl === "rtxx_5070vid.mp4" || p.ytVideoUrl === "rtx_5070.mp4") {
-                        p.ytVideoUrl = "rtx_5070vid.mp4"; // Diperbaiki otomatis!
-                        isPatched = true;
+                    // Paksa timpa nama file untuk RTX 5070
+                    if(p.code === "UTX-5070") {
+                        if(p.ytVideoUrl !== "rtx_5070vid.mp4" || p.imageUrl !== "rtx_5070.jpg") {
+                            p.ytVideoUrl = "rtx_5070vid.mp4";
+                            p.imageUrl = "rtx_5070.jpg";
+                            isPatched = true;
+                        }
+                    }
+                    // Paksa timpa nama file untuk RTX 5090
+                    if(p.code === "UTX-5090-ROG") {
+                        if(p.ytVideoUrl !== "rtx_5090_rog_edisi_dhabab.mp4" || p.imageUrl !== "rtx_5090.jpg") {
+                            p.ytVideoUrl = "rtx_5090_rog_edisi_dhabab.mp4";
+                            p.imageUrl = "rtx_5090.jpg";
+                            isPatched = true;
+                        }
                     }
                 });
                 
-                // Jika tadi ada yang diperbaiki, simpan ulang memorinya
+                // Simpan ulang ke memori browser
                 if(isPatched) {
                     localStorage.setItem('utx_products', JSON.stringify(existingMem));
+                    console.log("Database berhasil dipaksa sinkron dengan file GitHub!");
                 }
             }
-            // --------------------------------------------------
-            
+            // ------------------------------------------
+
             renderAdminData();
             initAdminProfile();
         });
