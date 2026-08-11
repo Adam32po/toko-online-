@@ -356,37 +356,79 @@
         let orders = [];
         let savedExpense = 0;
 
+        // INJEKSI DATA DEFAULT (TOTAL 4 HARDWARE RESMI GITHUB)
         const autoInjectDataGuru = () => {
-            let existingProducts = JSON.parse(localStorage.getItem('utx_products'));
-            if (!existingProducts || existingProducts.length === 0) {
-                const produkAwal = [
-                    {
-                        id: 1700000000001,
-                        code: "UTX-5070",
-                        name: "NVIDIA RTX 5070 (Pre-Loaded)",
-                        price: 12500000,
-                        stock: 25,
-                        sold: 0,
-                        imageUrl: "rtx_5070.jpg",
-                        sizes: ["12GB GDDR7", "Standard Edition"],
-                        ytVideoUrl: "rtx_5070vid.mp4",
-                        ytVideoId: ""
-                    },
-                    {
-                        id: 1700000000002,
-                        code: "UTX-5090-ROG",
-                        name: "ROG RTX 5090 DHABAB EDITION (LIMITED)",
-                        price: 35999000,
-                        stock: 10,
-                        sold: 0,
-                        imageUrl: "rtx_5090.jpg",
-                        sizes: ["32GB GDDR7X", "Dhabab Special"],
-                        ytVideoUrl: "rtx_5090_rog_edisi_dhabab.mp4",
-                        ytVideoId: ""
+            let existingProducts = JSON.parse(localStorage.getItem('utx_products')) || [];
+            
+            const defaultProducts = [
+                {
+                    id: 1700000000001,
+                    code: "UTX-5070",
+                    name: "NVIDIA RTX 5070 (Pre-Loaded)",
+                    price: 12500000,
+                    stock: 25,
+                    sold: 0,
+                    imageUrl: "rtx_5070.jpg",
+                    sizes: ["12GB GDDR7", "Standard Edition"],
+                    ytVideoUrl: "rtx_5070vid.mp4",
+                    ytVideoId: ""
+                },
+                {
+                    id: 1700000000002,
+                    code: "UTX-5090-ROG",
+                    name: "ROG RTX 5090 DHABAB EDITION (LIMITED)",
+                    price: 35999000,
+                    stock: 10,
+                    sold: 0,
+                    imageUrl: "rtx_5090.jpg",
+                    sizes: ["32GB GDDR7X", "Dhabab Special"],
+                    ytVideoUrl: "rtx_5090_rog_edisi_dhabab.mp4",
+                    ytVideoId: ""
+                },
+                {
+                    id: 1700000000003,
+                    code: "UTX-5070TI-FRIEREN",
+                    name: "ROG RTX 5070 Ti FRIEREN EDITION",
+                    price: 18500000,
+                    stock: 15,
+                    sold: 0,
+                    imageUrl: "rtx_5070_ti_frieren.jpg",
+                    sizes: ["16GB GDDR7", "Frieren Custom White"],
+                    ytVideoUrl: "rtx_5070_ti_frieren.mp4",
+                    ytVideoId: ""
+                },
+                {
+                    id: 1700000000004,
+                    code: "UTX-5080-MIKU",
+                    name: "RTX 5080 HATSUNE MIKU EDITION (LIMITED)",
+                    price: 26500000,
+                    stock: 12,
+                    sold: 0,
+                    imageUrl: "rtx_5080_miku.jpg",
+                    sizes: ["16GB GDDR7", "Miku Turquoise Custom"],
+                    ytVideoUrl: "rtx_5080_miku.mp4",
+                    ytVideoId: ""
+                }
+            ];
+
+            if (existingProducts.length === 0) {
+                localStorage.setItem('utx_products', JSON.stringify(defaultProducts));
+                console.log("Auto-inject 4 produk awal berhasil.");
+            } else {
+                // Jika sudah ada data lama, tambahkan produk yang belum ada otomatis
+                let isUpdated = false;
+                defaultProducts.forEach(def => {
+                    const found = existingProducts.some(p => p.code === def.code);
+                    if (!found) {
+                        existingProducts.push(def);
+                        isUpdated = true;
                     }
-                ];
-                localStorage.setItem('utx_products', JSON.stringify(produkAwal));
-                console.log("Auto-inject berhasil.");
+                });
+
+                if (isUpdated) {
+                    localStorage.setItem('utx_products', JSON.stringify(existingProducts));
+                    console.log("Database diperbarui dengan item baru dari GitHub.");
+                }
             }
         };
 
@@ -511,7 +553,7 @@
                 tr.innerHTML = `
                     <td class="p-4 flex items-center gap-4 border-b-0">
                         <div class="relative flex-shrink-0">
-                            <img src="${p.imageUrl}" class="w-14 h-14 rounded object-contain border border-slate-600 bg-slate-900 p-0.5">
+                            <img src="${p.imageUrl}" class="w-14 h-14 rounded object-contain border border-slate-600 bg-slate-900 p-0.5" onerror="this.src='https://placehold.co/100x100/0f172a/00f2fe?text=GPU'">
                         </div>
                         <div class="min-w-0">
                             <p class="font-bold text-white truncate max-w-[200px] md:max-w-xs" title="${p.name}">${p.name}</p>
@@ -617,7 +659,6 @@
 
             const ordersList = JSON.parse(localStorage.getItem('utx_orders')) || [];
 
-            // Helper format Tanggal Lokal (YYYY-MM-DD)
             const formatDateKey = (d) => {
                 const year = d.getFullYear();
                 const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -631,7 +672,6 @@
                 return `${day}/${month}`;
             };
 
-            // Inisialisasi referensi 3 hari (Kemarin Lusa, Kemarin, Hari Ini)
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const yesterday = new Date(today.getTime() - 86400000);
@@ -658,7 +698,6 @@
                 }
             ];
 
-            // Hitung pemasukan riil per tanggal dari seluruh data transaksi
             ordersList.forEach(o => {
                 const amt = Number(o.total) || 0;
                 let orderDateKey = '';
@@ -668,7 +707,6 @@
                     if (!isNaN(parsed.getTime())) {
                         orderDateKey = formatDateKey(parsed);
                     } else {
-                        // Antisipasi format DD/MM/YYYY atau DD-MM-YYYY
                         const parts = String(o.date).split(/[-/]/);
                         if (parts.length === 3) {
                             if (parts[0].length === 4) {
@@ -680,17 +718,14 @@
                     }
                 }
 
-                // Cocokkan ke masing-masing hari
                 const match = daysData.find(d => d.dateKey === orderDateKey);
                 if (match) {
                     match.income += amt;
                 } else {
-                    // Jika transaksi baru / tanggal hari ini
                     daysData[2].income += amt;
                 }
             });
 
-            // Cari nilai max sebagai acuan bar 100%
             const maxVal = Math.max(...daysData.map(d => Math.max(d.income, d.expense)), 100000);
 
             daysData.forEach(d => {
@@ -895,7 +930,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             autoInjectDataGuru();
 
-            // KODE FORCE OVERWRITE
+            // KODE FORCE OVERWRITE & SINKRONISASI 4 PRODUK
             let existingMem = JSON.parse(localStorage.getItem('utx_products'));
             if(existingMem) {
                 let isPatched = false;
@@ -911,6 +946,20 @@
                         if(p.ytVideoUrl !== "rtx_5090_rog_edisi_dhabab.mp4" || p.imageUrl !== "rtx_5090.jpg") {
                             p.ytVideoUrl = "rtx_5090_rog_edisi_dhabab.mp4";
                             p.imageUrl = "rtx_5090.jpg";
+                            isPatched = true;
+                        }
+                    }
+                    if(p.code === "UTX-5070TI-FRIEREN") {
+                        if(p.ytVideoUrl !== "rtx_5070_ti_frieren.mp4" || p.imageUrl !== "rtx_5070_ti_frieren.jpg") {
+                            p.ytVideoUrl = "rtx_5070_ti_frieren.mp4";
+                            p.imageUrl = "rtx_5070_ti_frieren.jpg";
+                            isPatched = true;
+                        }
+                    }
+                    if(p.code === "UTX-5080-MIKU") {
+                        if(p.ytVideoUrl !== "rtx_5080_miku.mp4" || p.imageUrl !== "rtx_5080_miku.jpg") {
+                            p.ytVideoUrl = "rtx_5080_miku.mp4";
+                            p.imageUrl = "rtx_5080_miku.jpg";
                             isPatched = true;
                         }
                     }
