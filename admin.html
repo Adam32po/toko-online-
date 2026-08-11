@@ -219,7 +219,6 @@
                             </div>
                         </div>
                         
-                        <!-- UPDATE: Image URL (Sekarang bertipe TEXT untuk file lokal/web URL) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                             <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-brand-blue transition-colors">
                                 <label class="text-[10px] uppercase tracking-widest text-brand-blue font-bold block mb-2"><i class="fa-regular fa-image mr-1"></i> Nama File / URL Gambar *</label>
@@ -227,7 +226,6 @@
                                 <p class="text-[9px] text-slate-500 mt-2">Ketik nama file (jika ada di GitHub) atau paste link gambar.</p>
                             </div>
                             
-                            <!-- UPDATE: Video URL (Sekarang bertipe TEXT) -->
                             <div class="bg-slate-900/50 p-4 rounded border border-slate-700 border-dashed hover:border-red-500 transition-colors relative overflow-hidden">
                                 <div class="absolute -right-4 -bottom-4 text-red-500/10"><i class="fa-solid fa-play text-7xl"></i></div>
                                 <label class="text-[10px] uppercase tracking-widest text-red-400 font-bold block mb-2 relative z-10"><i class="fa-solid fa-video mr-1"></i> Nama File / URL Video (Opsional)</label>
@@ -358,6 +356,42 @@
         let orders = [];
         let savedExpense = 0;
 
+        // --- SISTEM AUTO-INJECT DATABASE AWAL ---
+        const autoInjectDataGuru = () => {
+            let existingProducts = JSON.parse(localStorage.getItem('utx_products'));
+            // Jika database benar-benar kosong, otomatis masukkan 2 produk ini
+            if (!existingProducts || existingProducts.length === 0) {
+                const produkAwal = [
+                    {
+                        id: 1700000000001,
+                        code: "UTX-5070",
+                        name: "NVIDIA RTX 5070 (Pre-Loaded)",
+                        price: 12500000,
+                        stock: 25,
+                        sold: 0,
+                        imageUrl: "rtx_5070.jpg",
+                        sizes: ["12GB GDDR7", "Standard Edition"],
+                        ytVideoUrl: "rtxx_5070vid.mp4",
+                        ytVideoId: ""
+                    },
+                    {
+                        id: 1700000000002,
+                        code: "UTX-5090-ROG",
+                        name: "ROG RTX 5090 DHABAB EDITION (LIMITED)",
+                        price: 35999000,
+                        stock: 10,
+                        sold: 0,
+                        imageUrl: "rtx_5090.jpg",
+                        sizes: ["32GB GDDR7X", "Dhabab Special"],
+                        ytVideoUrl: "rtx_5090_rog_edisi_dhabab.mp4",
+                        ytVideoId: ""
+                    }
+                ];
+                localStorage.setItem('utx_products', JSON.stringify(produkAwal));
+                console.log("Auto-inject berhasil: Produk guru sudah ditambahkan.");
+            }
+        };
+
         const initAdminProfile = () => {
             const currentAdminName = localStorage.getItem('utx_current_admin') || 'Root Admin';
             const admins = JSON.parse(localStorage.getItem('utx_admins')) || [];
@@ -408,7 +442,6 @@
             if(sectionId === 'admin-customers') renderOrdersTable();
         };
 
-        // Fungsi ekstrak ID YouTube dari link
         const extractVideoID = (url) => {
             let videoID = "";
             if(url) {
@@ -464,7 +497,6 @@
                 const isSoldOut = (p.stock === 0 || p.stock === undefined);
                 const sizesText = p.sizes ? p.sizes.join(', ') : '-';
                 
-                // Deteksi Video: File Lokal ATAU YouTube
                 let videoBadge = '';
                 if(p.ytVideoId) {
                     videoBadge = `<span class="bg-red-500/20 text-red-400 text-[9px] px-1.5 py-0.5 rounded border border-red-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-brands fa-youtube"></i> YouTube URL</span>`;
@@ -476,10 +508,11 @@
                 tr.className = "hover:bg-slate-800/50 transition-colors";
                 tr.innerHTML = `
                     <td class="p-4 flex items-center gap-4 border-b-0">
-                        <div class="relative">
-                            <img src="${p.imageUrl}" class="w-14 h-14 rounded object-cover border border-slate-600 bg-slate-900 p-0.5">
+                        <!-- FIX GAMBAR GEPENG: flex-shrink-0 dan object-contain -->
+                        <div class="relative flex-shrink-0">
+                            <img src="${p.imageUrl}" class="w-14 h-14 rounded object-contain border border-slate-600 bg-slate-900 p-0.5">
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <p class="font-bold text-white truncate max-w-[200px] md:max-w-xs" title="${p.name}">${p.name}</p>
                             <p class="text-[10px] text-brand-cyan font-mono mt-0.5">${p.code}</p>
                             ${videoBadge}
@@ -735,7 +768,7 @@
             
             // Proses URL Video
             const rawVideoUrl = document.getElementById('inp-video').value;
-            const extractedId = extractVideoID(rawVideoUrl); // Coba ekstrak jika formatnya link YouTube
+            const extractedId = extractVideoID(rawVideoUrl); 
 
             const newProduct = {
                 id: Date.now(),
@@ -744,10 +777,10 @@
                 price: parseFloat(document.getElementById('inp-price').value),
                 stock: parseInt(document.getElementById('inp-stock').value),
                 sold: 0,
-                imageUrl: document.getElementById('inp-image').value, // Input fleksibel (nama file atau link web)
+                imageUrl: document.getElementById('inp-image').value, 
                 sizes: sizesArray,
-                ytVideoUrl: rawVideoUrl,        // Simpan input asli (Bisa nama file mp4, atau link YT penuh)
-                ytVideoId: extractedId          // Akan berisi ID YouTube, atau KOSONG ("") jika file lokal
+                ytVideoUrl: rawVideoUrl,        
+                ytVideoId: extractedId          
             };
 
             products.push(newProduct);
@@ -760,7 +793,11 @@
             showAdminMenu('admin-products', document.querySelectorAll('.nav-btn')[1]);
         };
 
+        // SAAT HALAMAN DIBUKA
         document.addEventListener('DOMContentLoaded', () => {
+            // Panggil injeksi data pertama kali
+            autoInjectDataGuru();
+            
             renderAdminData();
             initAdminProfile();
         });
