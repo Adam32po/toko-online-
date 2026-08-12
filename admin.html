@@ -412,12 +412,12 @@
                 {
                     id: 1700000000005,
                     code: "UTX-4090-EVANGELION-EDITION",
-                    nama: "RTX 4090 EVANGELION EDITON (LIMITED)",
+                    name: "RTX 4090 EVANGELION EDITION (LIMITED)",
                     price: 119599000,
                     stock: 15,
                     sold: 0,
                     imageUrl: "asus_rtx_4090_edisi_evangelion.jpg",
-                    sizes: ["24GB GDDR6X", "EVA-02 EDIITON"],
+                    sizes: ["24GB GDDR6X", "EVA-02 EDITION"],
                     ytVideoUrl: "unboxing_rtx_4090_evangelion_edisi.mp4",
                     ytVideoId: ""
                 }
@@ -559,6 +559,9 @@
                     videoBadge = `<span class="bg-blue-500/20 text-brand-blue text-[9px] px-1.5 py-0.5 rounded border border-blue-500/30 flex items-center gap-1 w-max mt-1"><i class="fa-solid fa-film"></i> File Lokal (<b>${p.ytVideoUrl}</b>)</span>`;
                 }
 
+                // Perbaikan safety fallback jika nama belum disetel (krn typo 'nama' dari user sebelumnya)
+                const safeName = p.name || p.nama || 'Unnamed Product';
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/50 transition-colors";
                 tr.innerHTML = `
@@ -567,7 +570,7 @@
                             <img src="${p.imageUrl}" class="w-14 h-14 rounded object-contain border border-slate-600 bg-slate-900 p-0.5" onerror="this.src='https://placehold.co/100x100/0f172a/00f2fe?text=GPU'">
                         </div>
                         <div class="min-w-0">
-                            <p class="font-bold text-white truncate max-w-[200px] md:max-w-xs" title="${p.name}">${p.name}</p>
+                            <p class="font-bold text-white truncate max-w-[200px] md:max-w-xs" title="${safeName}">${safeName}</p>
                             <p class="text-[10px] text-brand-cyan font-mono mt-0.5">${p.code}</p>
                             ${videoBadge}
                         </div>
@@ -885,11 +888,14 @@
                 const totalIn = p.stock + sold;
                 const percentage = totalIn > 0 ? Math.round((sold / totalIn) * 100) : 0;
 
+                // Memastikan nama tidak kosong jika ada error object sebelumnya
+                const safeName = p.name || p.nama || 'Unnamed Product';
+
                 const div = document.createElement('div');
                 div.innerHTML = `
                     <div class="flex justify-between items-end text-sm mb-2">
                         <div>
-                            <p class="font-bold text-white text-xs">${p.name}</p>
+                            <p class="font-bold text-white text-xs">${safeName}</p>
                             <p class="text-[10px] text-brand-cyan font-mono mt-0.5">${p.code}</p>
                         </div>
                         <div class="text-right text-[10px] font-mono text-slate-400">
@@ -917,7 +923,7 @@
             const newProduct = {
                 id: Date.now(),
                 code: document.getElementById('inp-code').value,
-                name: document.getElementById('inp-name').value,
+                name: document.getElementById('inp-name').value, // Pastikan pakai .name
                 price: parseFloat(document.getElementById('inp-price').value),
                 stock: parseInt(document.getElementById('inp-stock').value),
                 sold: 0,
@@ -968,6 +974,15 @@
                         p.ytVideoUrl = "rtx_5080_miku.mp4";
                         p.imageUrl = "rtx_5080_miku.jpg";
                         p.price = 83300000;
+                        isPatched = true;
+                    }
+                    // Fix untuk item ke-5 jika sempat tersimpan salah
+                    if(p.code === "UTX-4090-EVANGELION-EDITION") {
+                        if(p.nama) { p.name = p.nama; delete p.nama; isPatched = true; } // ubah 'nama' jadi 'name'
+                        p.ytVideoUrl = "unboxing_rtx_4090_evangelion_edisi.mp4";
+                        p.imageUrl = "asus_rtx_4090_edisi_evangelion.jpg";
+                        p.price = 119599000;
+                        p.name = "RTX 4090 EVANGELION EDITION (LIMITED)"; // pastikan namanya benar
                         isPatched = true;
                     }
                 });
